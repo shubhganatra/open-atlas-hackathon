@@ -5,3 +5,9 @@ backend/app/data/chroma/
 backend/app/data/uploads/
 .DS_Store
 *.pyc
+
+# Internal working docs — kept locally for our own reference, not part of
+# the public submission repo. README.md is the public-facing doc instead.
+DECISIONS.md
+PLAN.md
+Hackathon-Setup-Guide-OPENATLAS26.pdf

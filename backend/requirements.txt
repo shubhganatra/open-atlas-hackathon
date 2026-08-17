@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+pydantic
+python-dotenv
+langgraph
+openai
+chromadb
+icalendar
+python-multipart

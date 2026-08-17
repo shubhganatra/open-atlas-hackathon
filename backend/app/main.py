@@ -10,6 +10,7 @@ personas, not a conversational flow. See PLAN.md Phase 5 / DECISIONS.md.
 from __future__ import annotations
 
 import logging
+import os
 
 from fastapi import FastAPI, File, Form, HTTPException, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -28,12 +29,18 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Financial Onboarding Copilot")
 
-# Local dev only — this is a hackathon demo (frontend on localhost:3000, backend
-# on localhost:8000), not a deployed multi-origin service. Tighten before ever
-# shipping this past the demo.
+# Local dev origins always allowed; the deployed Vercel frontend is covered by
+# regex (preview + production URLs are both *.vercel.app unless a custom
+# domain is attached) rather than a hardcoded string, since the exact preview
+# URL changes per-deploy and isn't known in advance. ALLOWED_ORIGINS is an
+# escape hatch for a custom domain, set via Render's env vars — comma-separated,
+# unset by default, never committed. See DECISIONS.md "Deployment".
+_extra_origins = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "").split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", *_extra_origins],
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_methods=["*"],
     allow_headers=["*"],
 )

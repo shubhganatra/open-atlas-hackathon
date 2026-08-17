@@ -1,0 +1,26 @@
+# Render Blueprint for the backend only — the frontend deploys separately on
+# Vercel (native Next.js host). See DECISIONS.md "Deployment": the backend
+# needs a persistent process (in-memory "mark done" state, local Chroma index,
+# local file uploads), which Vercel's stateless serverless model doesn't fit
+# cleanly; Render keeps a normal long-running process, so none of that needed
+# re-architecting.
+services:
+  - type: web
+    name: financeone-backend
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.11
+      # Secrets — set these in the Render dashboard, never committed here.
+      - key: GROQ_API_KEY
+        sync: false
+      # Optional: only needed if the frontend ends up on a custom domain
+      # rather than the default *.vercel.app (already covered by CORS regex
+      # in app/main.py). Comma-separated list of extra allowed origins.
+      - key: ALLOWED_ORIGINS
+        sync: false
